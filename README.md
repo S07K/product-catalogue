@@ -10,6 +10,7 @@ It's built as a foundation that can grow: the **product data source**, **look an
 | [AI_USAGE.md](./AI_USAGE.md)   | Tools, prompts, and where the AI was wrong                          |
 | [PLAN.md](./PLAN.md)           | The spec the build followed                                         |
 | [CLAUDE.md](./CLAUDE.md)       | Rules for AI agents working in this repo                            |
+| [AGENTS.md](./AGENTS.md)       | Setup and verification steps for any AI coding agent                |
 
 ## Quick start (Docker, recommended)
 
@@ -28,6 +29,21 @@ Try it: open a product → **Enquire** → submit the form → see the "Thank yo
 
 > The first build takes a couple of minutes. Product data comes live from the Fake Store API, so internet access is needed. If Fake Store is down or rate-limiting, run fully offline with bundled data: `PRODUCT_SOURCE=fixture docker compose up --build`.
 > Ports clash? `WEB_PORT=8081 MAILPIT_UI_PORT=8026 docker compose up --build`.
+
+## Set up with an AI coding agent (optional)
+
+Paste this into Claude Code, Cursor, Codex or similar, from the repository root:
+
+```text
+Set up and verify this project locally by following AGENTS.md. Use Docker if it's available.
+1. Start the stack and confirm GET http://localhost:8080/api/health/ready reports "ok".
+2. Prove the main flow: submit one test enquiry to POST /api/enquiries, then confirm it
+   arrived in the Mailpit inbox at http://localhost:8025/api/v1/messages.
+3. Run `npm ci && npm run check` and report the test results.
+If Fake Store is unreachable, use the PRODUCT_SOURCE=fixture fallback. If a port is busy,
+use the WEB_PORT/MAILPIT_UI_PORT overrides. Do not create accounts, add API keys or edit
+source files. Finish with a short report: what ran, what passed, the URLs to open.
+```
 
 ## Local development (without Docker)
 

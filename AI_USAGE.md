@@ -7,6 +7,7 @@
 ## Agent instruction files
 
 - [`CLAUDE.md`](./CLAUDE.md): architecture rules, conventions and testing expectations the agent must follow.
+- [`AGENTS.md`](./AGENTS.md): tool-agnostic setup and verification steps (read by Codex, Cursor and others), pointing back to `CLAUDE.md` for the rules. The README has a copy-paste prompt so a reviewer can have their own agent set up and verify the project.
 
 ## Plan / spec
 
