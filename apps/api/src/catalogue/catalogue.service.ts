@@ -3,6 +3,7 @@ import type { CategoryProducts, CategorySummary, Product } from '@catalogue/shar
 import type { ProductSource } from '../adapters/product-source/product-source';
 import type { FeaturedRepository } from '../adapters/featured/featured-repository';
 import { AppError } from '../errors';
+import { searchProducts } from './search';
 
 /** Used when the owner has not curated a category. */
 export const CATEGORY_TOP_RATED_FALLBACK_COUNT = 3;
@@ -52,18 +53,9 @@ export class CatalogueService {
     return { category, topRated, others: inCategory.filter((p) => !topIds.has(p.id)) };
   }
 
-  /**
-   * Case-insensitive match on title, description and category name. Every
-   * word of the query must appear somewhere, so "mens jacket" finds
-   * "Mens Cotton Jacket"; apostrophes are ignored (see DECISIONS.md).
-   */
+  /** Whole-word, ranked search over the catalogue. Rules live in ./search.ts (DECISIONS.md A3). */
   async search(query: string): Promise<Product[]> {
-    const terms = normalise(query).split(/\s+/).filter(Boolean);
-    if (terms.length === 0) return [];
-    return (await this.products.listProducts()).filter((p) => {
-      const haystack = normalise(`${p.title} ${p.description} ${p.category.name}`);
-      return terms.every((t) => haystack.includes(t));
-    });
+    return searchProducts(await this.products.listProducts(), query);
   }
 
   async getProduct(id: string): Promise<Product> {
@@ -83,11 +75,6 @@ export class CatalogueService {
     }
     return resolved;
   }
-}
-
-/** Lower-case and drop apostrophes so "mens" matches "Men's". */
-function normalise(text: string): string {
-  return text.toLowerCase().replace(/['’]/g, '');
 }
 
 function topByRating(products: Product[]): Product[] {
