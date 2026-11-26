@@ -1,18 +1,20 @@
 import { ApiRequestError } from '../api/client';
 import { Button } from './ui/Button';
 import { Card } from './ui/Card';
+import { Skeleton } from './ui/Skeleton';
 
-/** Placeholder tiles that keep layout stable while data loads. */
+/** Shimmering placeholder tiles shaped like product tiles, so the layout doesn't jump when data arrives. */
 export function LoadingGrid({ count = 4, label }: { count?: number; label: string }) {
   return (
     <div role="status" aria-live="polite">
       <span className="sr-only">{label}</span>
-      <div
-        className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 lg:grid-cols-4"
-        aria-hidden="true"
-      >
+      <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 lg:grid-cols-4">
         {Array.from({ length: count }, (_, i) => (
-          <div key={i} className="aspect-square animate-pulse rounded-plate bg-surface-muted" />
+          <div key={i} className="flex flex-col gap-3">
+            <Skeleton className="aspect-square rounded-plate" />
+            <Skeleton className="h-4 w-4/5 rounded-control" />
+            <Skeleton className="h-5 w-1/3 rounded-control" />
+          </div>
         ))}
       </div>
     </div>

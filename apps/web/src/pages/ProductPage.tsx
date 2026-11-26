@@ -2,19 +2,45 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { useProduct } from '../api/hooks';
 import { ApiRequestError } from '../api/client';
+import { ProductImage } from '../components/ProductImage';
 import { ErrorState } from '../components/states';
 import { Rating } from '../components/Rating';
 import { Button } from '../components/ui/Button';
-import { EnquiryForm } from '../features/enquiry/EnquiryForm';
+import { Skeleton } from '../components/ui/Skeleton';
+import { EnquiryDialog } from '../features/enquiry/EnquiryDialog';
 import { formatPrice } from '../lib/format';
-import { plateClass } from '../lib/plate';
 import { useDocumentTitle } from '../lib/use-document-title';
 import { NotFoundPage } from './NotFoundPage';
 
+const layoutClass = 'grid gap-8 md:grid-cols-2 md:gap-12';
+
 export function ProductPage() {
   const { id = '' } = useParams();
-  // Keyed by id so per-product UI state (e.g. an open enquiry form) resets when navigating between products.
+  // Keyed by id so per-product UI state (e.g. an open enquiry dialog) resets when navigating between products.
   return <ProductDetails key={id} id={id} />;
+}
+
+/** Shimmering placeholder in the exact shape of the details layout, so nothing jumps on load. */
+function ProductDetailsSkeleton() {
+  return (
+    <div role="status" className={layoutClass}>
+      <span className="sr-only">Loading product</span>
+      <Skeleton className="aspect-square rounded-plate" />
+      <div className="flex flex-col gap-4">
+        <Skeleton className="h-4 w-24 rounded-control" />
+        <Skeleton className="h-9 w-11/12 rounded-control" />
+        <Skeleton className="h-9 w-2/3 rounded-control" />
+        <Skeleton className="h-4 w-28 rounded-control" />
+        <Skeleton className="h-9 w-32 rounded-control" />
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-4 w-full rounded-control" />
+          <Skeleton className="h-4 w-full rounded-control" />
+          <Skeleton className="h-4 w-3/4 rounded-control" />
+        </div>
+        <Skeleton className="h-12 w-32 rounded-control" />
+      </div>
+    </div>
+  );
 }
 
 function ProductDetails({ id }: { id: string }) {
@@ -22,16 +48,7 @@ function ProductDetails({ id }: { id: string }) {
   const [enquiring, setEnquiring] = useState(false);
   useDocumentTitle(result.data?.title);
 
-  if (result.isPending) {
-    return (
-      <div
-        role="status"
-        className="aspect-square max-w-xl animate-pulse rounded-plate bg-surface-muted"
-      >
-        <span className="sr-only">Loading product</span>
-      </div>
-    );
-  }
+  if (result.isPending) return <ProductDetailsSkeleton />;
   if (result.isError) {
     if (result.error instanceof ApiRequestError && result.error.status === 404) {
       return <NotFoundPage title="Product not found" />;
@@ -41,21 +58,20 @@ function ProductDetails({ id }: { id: string }) {
 
   const product = result.data;
   return (
-    <article className="grid gap-8 md:grid-cols-2 md:gap-12">
-      <div
-        className={`relative aspect-square overflow-hidden rounded-plate ${plateClass(product.category.slug)}`}
-      >
-        <img
-          src={product.imageUrl}
-          alt={product.title}
-          className="absolute inset-0 h-full w-full object-contain p-12 mix-blend-multiply sm:p-16"
-        />
-      </div>
+    <article className={layoutClass}>
+      <ProductImage
+        src={product.imageUrl}
+        alt={product.title}
+        categorySlug={product.category.slug}
+        className="aspect-square rounded-plate"
+        imageClassName="p-12 sm:p-16"
+        loading="eager"
+      />
 
       <div className="flex flex-col gap-4">
         <Link
           to={`/categories/${product.category.slug}`}
-          className="text-sm font-medium text-brand hover:underline"
+          className="self-start text-sm font-medium text-brand hover:underline"
         >
           {product.category.name}
         </Link>
@@ -64,14 +80,16 @@ function ProductDetails({ id }: { id: string }) {
         <p className="font-display text-3xl font-semibold">{formatPrice(product.price)}</p>
         <p className="max-w-prose leading-relaxed text-text-muted">{product.description}</p>
 
-        {enquiring ? (
-          <EnquiryForm product={product} onCancel={() => setEnquiring(false)} />
-        ) : (
-          <Button className="self-start px-6 py-3 text-base" onClick={() => setEnquiring(true)}>
-            Enquire
-          </Button>
-        )}
+        <Button
+          className="mt-2 self-start px-6 py-3 text-base"
+          aria-haspopup="dialog"
+          onClick={() => setEnquiring(true)}
+        >
+          Enquire
+        </Button>
       </div>
+
+      <EnquiryDialog product={product} open={enquiring} onClose={() => setEnquiring(false)} />
     </article>
   );
 }

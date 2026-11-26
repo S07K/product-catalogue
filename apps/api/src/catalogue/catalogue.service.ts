@@ -1,5 +1,5 @@
 import type { Logger } from 'pino';
-import type { Category, CategoryProducts, Product } from '@catalogue/shared';
+import type { CategoryProducts, CategorySummary, Product } from '@catalogue/shared';
 import type { ProductSource } from '../adapters/product-source/product-source';
 import type { FeaturedRepository } from '../adapters/featured/featured-repository';
 import { AppError } from '../errors';
@@ -14,10 +14,21 @@ export class CatalogueService {
     private readonly logger: Logger,
   ) {}
 
-  async listCategories(): Promise<Category[]> {
-    const bySlug = new Map<string, Category>();
-    for (const p of await this.products.listProducts()) bySlug.set(p.category.slug, p.category);
-    return [...bySlug.values()].sort((a, b) => a.name.localeCompare(b.name));
+  /** Categories derived from products, each with a count and its highest-rated product's image. */
+  async listCategories(): Promise<CategorySummary[]> {
+    const bySlug = new Map<string, Product[]>();
+    for (const p of await this.products.listProducts()) {
+      const group = bySlug.get(p.category.slug);
+      if (group) group.push(p);
+      else bySlug.set(p.category.slug, [p]);
+    }
+    return [...bySlug.values()]
+      .map((group) => ({
+        ...group[0]!.category,
+        productCount: group.length,
+        imageUrl: topByRating(group)[0]?.imageUrl ?? null,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
   }
 
   async getHomeFeatured(): Promise<Product[]> {

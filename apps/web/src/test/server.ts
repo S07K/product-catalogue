@@ -4,7 +4,12 @@ import { electronics, jewellery, products } from './fixtures';
 
 /** Default happy-path API. Individual tests override handlers with server.use(...). */
 export const handlers = [
-  http.get('/api/categories', () => HttpResponse.json([electronics, jewellery])),
+  http.get('/api/categories', () =>
+    HttpResponse.json([
+      { ...electronics, productCount: 4, imageUrl: 'https://images.test/1.png' },
+      { ...jewellery, productCount: 2, imageUrl: 'https://images.test/4.png' },
+    ]),
+  ),
   http.get('/api/products/featured', () => HttpResponse.json(products.slice(0, 5))),
   http.get('/api/categories/:slug/products', ({ params }) => {
     const inCategory = products.filter((p) => p.category.slug === params.slug);

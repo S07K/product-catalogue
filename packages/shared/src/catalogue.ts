@@ -36,6 +36,14 @@ export const ProductSchema = z.object({
 });
 export type Product = z.infer<typeof ProductSchema>;
 
+/** Category as listed for navigation and the home page. */
+export const CategorySummarySchema = CategorySchema.extend({
+  productCount: z.number().int().nonnegative(),
+  /** Representative image: the category's highest-rated product. */
+  imageUrl: z.url().nullable(),
+});
+export type CategorySummary = z.infer<typeof CategorySummarySchema>;
+
 export const CategoryProductsSchema = z.object({
   category: CategorySchema,
   topRated: z.array(ProductSchema),

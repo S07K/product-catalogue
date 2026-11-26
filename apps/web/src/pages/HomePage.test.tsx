@@ -23,6 +23,15 @@ describe('Home page', () => {
     );
   });
 
+  it('shows each category with its image and product count', async () => {
+    renderApp('/');
+    const section = await screen.findByRole('region', { name: 'Shop by category' });
+    const link = await within(section).findByRole('link', { name: /Electronics/ });
+    expect(link).toHaveAttribute('href', '/categories/electronics');
+    expect(link).toHaveTextContent('4 products');
+    expect(link.querySelector('img')).toHaveAttribute('src', 'https://images.test/1.png');
+  });
+
   it('shows an error with a retry when the API is unavailable', async () => {
     server.use(
       http.get('/api/products/featured', () =>

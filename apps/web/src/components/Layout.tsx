@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import { useCategories } from '../api/hooks';
+import { Logo } from './Logo';
 import { SearchBar } from './SearchBar';
 
 function CategoryNav() {
@@ -10,7 +11,8 @@ function CategoryNav() {
 
   return (
     <nav aria-label="Categories" className="border-t border-border">
-      <ul className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-4">
+      {/* px-1 here + px-3 on each link = the page's px-4 gutter, so labels line up with the logo and content. */}
+      <ul className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-1">
         {categories.map((category) => (
           <li key={category.slug}>
             <NavLink
@@ -52,8 +54,9 @@ export function Layout() {
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:gap-6">
           <Link
             to="/"
-            className="shrink-0 font-display text-xl font-bold tracking-tight text-brand"
+            className="flex shrink-0 items-center gap-2.5 font-display text-xl font-bold tracking-tight text-brand"
           >
+            <Logo className="h-9 w-9" />
             Product Catalogue
           </Link>
           {/* key resets the input when the URL query changes (e.g. browser back). */}

@@ -2,7 +2,7 @@ import { z } from 'zod';
 import {
   ApiErrorSchema,
   CategoryProductsSchema,
-  CategorySchema,
+  CategorySummarySchema,
   EnquiryResponseSchema,
   ProductSchema,
   type EnquiryInput,
@@ -69,7 +69,7 @@ async function request<T>(path: string, schema: z.ZodType<T>, init?: RequestInit
 }
 
 export const api = {
-  getCategories: () => request('/categories', z.array(CategorySchema)),
+  getCategories: () => request('/categories', z.array(CategorySummarySchema)),
   getFeaturedProducts: () => request('/products/featured', z.array(ProductSchema)),
   getCategoryProducts: (slug: string) =>
     request(`/categories/${encodeURIComponent(slug)}/products`, CategoryProductsSchema),

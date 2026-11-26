@@ -1,34 +1,27 @@
 import { Link } from 'react-router';
 import type { Product } from '@catalogue/shared';
 import { formatPrice } from '../lib/format';
-import { plateClass } from '../lib/plate';
+import { ProductImage } from './ProductImage';
 import { Rating } from './Rating';
 
 type TileSize = 'regular' | 'spotlight';
 
 /**
  * A product on its category's colour plate. The whole tile is one link, so
- * clicking anywhere opens the product page. `mix-blend-multiply` lets the
- * white backgrounds of product photos take on the plate colour.
+ * clicking anywhere opens the product page.
  */
 export function ProductTile({ product, size = 'regular' }: { product: Product; size?: TileSize }) {
   const spotlight = size === 'spotlight';
   return (
     <Link to={`/products/${product.id}`} className="group flex h-full flex-col gap-3">
-      <div
-        className={`relative overflow-hidden rounded-plate ${plateClass(product.category.slug)} ${
-          spotlight ? 'aspect-square lg:aspect-auto lg:flex-1' : 'aspect-square'
-        }`}
-      >
-        <img
-          src={product.imageUrl}
-          alt=""
-          loading="lazy"
-          className={`absolute inset-0 h-full w-full object-contain mix-blend-multiply ${
-            spotlight ? 'p-10 sm:p-16' : 'p-6 sm:p-8'
-          }`}
-        />
-      </div>
+      <ProductImage
+        src={product.imageUrl}
+        alt=""
+        categorySlug={product.category.slug}
+        className={`rounded-plate ${spotlight ? 'aspect-square lg:aspect-auto lg:flex-1' : 'aspect-square'}`}
+        imageClassName={spotlight ? 'p-10 sm:p-16' : 'p-6 sm:p-8'}
+        loading={spotlight ? 'eager' : 'lazy'}
+      />
       <div className="flex flex-col gap-1 px-1">
         <h3
           className={`line-clamp-2 text-text group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4 ${

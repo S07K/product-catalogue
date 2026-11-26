@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { renderApp } from '../../test/render';
 import { server } from '../../test/server';
@@ -11,6 +11,20 @@ async function openEnquiryForm() {
 }
 
 describe('Enquiry', () => {
+  it('opens a dialog about the current product, focused on the first field', async () => {
+    await openEnquiryForm();
+    const dialog = screen.getByRole('dialog', { name: 'Enquire about this product' });
+    expect(within(dialog).getByText('Gold Ring')).toBeInTheDocument();
+    expect(screen.getByLabelText('Name')).toHaveFocus();
+  });
+
+  it('closes the dialog with the close button', async () => {
+    const { user } = await openEnquiryForm();
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Enquire' })).toBeInTheDocument();
+  });
+
   it('submits contact details and shows a thank you message', async () => {
     let received: unknown;
     server.use(
@@ -30,6 +44,8 @@ describe('Enquiry', () => {
       await screen.findByRole('heading', { name: 'Thank you for your enquiry!' }),
     ).toHaveFocus();
     expect(screen.getByText('Reference: ref-42')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Done' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(received).toEqual({
       productId: '4',
       name: 'Ada Lovelace',

@@ -4,6 +4,32 @@
 @import '@fontsource-variable/bricolage-grotesque';
 @import '@fontsource-variable/instrument-sans';
 
+/*
+ * Loading shimmer: a light band sweeping across whatever background the element
+ * already has (a neutral skeleton or a category plate). Motion is disabled for
+ * users who prefer reduced motion (see the media query below).
+ */
+@utility shimmer {
+  background-image: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgb(255 255 255 / 0.6) 50%,
+    transparent 80%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: shimmer 1.4s linear infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+
 @layer base {
   html {
     @apply bg-page text-text font-sans antialiased;

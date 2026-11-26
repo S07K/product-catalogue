@@ -20,12 +20,28 @@ describe('catalogue routes', () => {
   });
 
   describe('GET /api/categories', () => {
-    it('lists categories derived from products, sorted by name', async () => {
+    it('lists categories with counts and their top-rated image, sorted by name', async () => {
       const res = await request(app).get('/api/categories').expect(200);
       expect(res.body).toEqual([
-        { slug: 'electronics', name: 'Electronics' },
-        { slug: 'jewellery', name: 'Jewellery' },
-        { slug: 'mens-clothing', name: "Men's Clothing" },
+        {
+          slug: 'electronics',
+          name: 'Electronics',
+          productCount: 4,
+          // #2 and #4 tie on 4.8; #2 wins on number of ratings.
+          imageUrl: 'https://images.example.com/2.png',
+        },
+        {
+          slug: 'jewellery',
+          name: 'Jewellery',
+          productCount: 2,
+          imageUrl: 'https://images.example.com/5.png',
+        },
+        {
+          slug: 'mens-clothing',
+          name: "Men's Clothing",
+          productCount: 1,
+          imageUrl: 'https://images.example.com/7.png',
+        },
       ]);
     });
   });
