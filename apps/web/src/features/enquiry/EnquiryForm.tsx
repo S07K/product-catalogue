@@ -26,6 +26,12 @@ export function EnquiryForm({ product, onCancel }: { product: Product; onCancel:
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const submit = useSubmitEnquiry();
   const thankYouRef = useRef<HTMLHeadingElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // After a failed submit, move focus to the first invalid field so the error is announced.
+  useEffect(() => {
+    formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+  }, [fieldErrors]);
 
   // Move focus to the confirmation so keyboard and screen-reader users know it worked.
   useEffect(() => {
@@ -82,6 +88,7 @@ export function EnquiryForm({ product, onCancel }: { product: Product; onCancel:
   return (
     <Card className="p-6">
       <form
+        ref={formRef}
         noValidate
         onSubmit={onSubmit}
         aria-labelledby="enquiry-heading"

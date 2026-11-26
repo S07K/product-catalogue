@@ -20,6 +20,14 @@ describe('EnquiryInputSchema', () => {
     expect(parsed.message).toBeUndefined();
   });
 
+  it('uses friendly messages when required fields are missing entirely', () => {
+    const result = EnquiryInputSchema.safeParse({ productId: '1' });
+    expect(result.error?.issues.map((i) => i.message)).toEqual([
+      'Please enter your name',
+      'Please enter a valid email address',
+    ]);
+  });
+
   it.each([
     ['missing name', { ...valid, name: '   ' }, 'name'],
     ['invalid email', { ...valid, email: 'not-an-email' }, 'email'],

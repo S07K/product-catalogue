@@ -13,13 +13,16 @@ export const ENQUIRY_LIMITS = {
 } as const;
 
 export const EnquiryInputSchema = z.object({
-  productId: z.string().trim().min(1),
+  productId: z.string({ error: 'Product is required' }).trim().min(1, 'Product is required'),
   name: z
-    .string()
+    .string({ error: 'Please enter your name' })
     .trim()
     .min(1, 'Please enter your name')
     .max(ENQUIRY_LIMITS.nameMax, `Name must be ${ENQUIRY_LIMITS.nameMax} characters or fewer`),
-  email: z.string().trim().pipe(z.email('Please enter a valid email address')),
+  email: z
+    .string({ error: 'Please enter a valid email address' })
+    .trim()
+    .pipe(z.email('Please enter a valid email address')),
   phone: optionalText(
     z
       .string()

@@ -10,12 +10,13 @@ export function ProductTile({ product }: { product: Product }) {
       to={`/products/${product.id}`}
       className="group flex h-full flex-col overflow-hidden rounded-card border border-border bg-surface transition-shadow hover:shadow-md"
     >
-      <div className="flex aspect-square items-center justify-center bg-surface p-6">
+      {/* Fixed square frame: images of any aspect ratio can't change the tile height. */}
+      <div className="relative aspect-square overflow-hidden bg-surface">
         <img
           src={product.imageUrl}
           alt=""
           loading="lazy"
-          className="h-full w-full object-contain transition-transform group-hover:scale-105"
+          className="absolute inset-0 h-full w-full object-contain p-6 transition-transform group-hover:scale-105"
         />
       </div>
       <div className="flex flex-1 flex-col gap-2 border-t border-border p-4">

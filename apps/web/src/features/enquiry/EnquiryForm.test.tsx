@@ -56,6 +56,7 @@ describe('Enquiry', () => {
       'Please enter a valid email address',
     );
     expect(screen.getByLabelText('Email')).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByLabelText('Name')).toHaveFocus();
     expect(called).toBe(false);
   });
 
