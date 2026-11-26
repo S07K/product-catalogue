@@ -186,6 +186,7 @@ export function EnquiryForm({
             label="Name"
             name="name"
             autoComplete="name"
+            placeholder="e.g. Jane Citizen"
             required
             data-autofocus
             maxLength={ENQUIRY_LIMITS.nameMax}
@@ -198,6 +199,7 @@ export function EnquiryForm({
             name="email"
             type="email"
             autoComplete="email"
+            placeholder="you@example.com"
             required
             value={values.email}
             onChange={(e) => update('email')(e.target.value)}
@@ -209,6 +211,7 @@ export function EnquiryForm({
           name="phone"
           type="tel"
           autoComplete="tel"
+          placeholder="e.g. 0412 345 678"
           value={values.phone}
           onChange={(e) => update('phone')(e.target.value)}
           error={fieldErrors.phone}
