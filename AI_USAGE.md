@@ -29,6 +29,7 @@
 1. **Framework bias from tooling.** The environment's plugins defaulted to Next.js. A full-stack framework would blur the client/backend boundary the brief asks for, so I rejected it in favour of a separate SPA and API.
 2. **"Latest" isn't always compatible.** The newest TypeScript (7.x) is outside typescript-eslint's supported range (`<6.1`). We caught it by checking peer dependencies before installing, and pinned TypeScript `~6.0.3`.
 3. **Misread version output.** While writing `package.json`, the agent took dependency versions from the wrong lines of a batched `npm view` output (e.g. `@testing-library/jest-dom@^6` instead of `8`). We caught it by re-checking the versions before installing.
+4. **Tests that pass for the wrong reason.** All 56 AI-written API tests passed on the first run. To check they actually protect behaviour, I deliberately broke the code: removed HTML escaping, ignored the curated category list, and changed search from "every word" to "any word". The first two were caught. The search change was **not**, because the only multi-word test ("men's jacket") passed either way. I added a test where the two semantics differ ("gaming drive" must return nothing), and confirmed it fails against the broken code.
 
 ## Time spent
 
