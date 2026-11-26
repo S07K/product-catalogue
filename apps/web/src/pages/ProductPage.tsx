@@ -5,9 +5,9 @@ import { ApiRequestError } from '../api/client';
 import { ErrorState } from '../components/states';
 import { Rating } from '../components/Rating';
 import { Button } from '../components/ui/Button';
-import { Card } from '../components/ui/Card';
 import { EnquiryForm } from '../features/enquiry/EnquiryForm';
 import { formatPrice } from '../lib/format';
+import { plateClass } from '../lib/plate';
 import { useDocumentTitle } from '../lib/use-document-title';
 import { NotFoundPage } from './NotFoundPage';
 
@@ -24,7 +24,10 @@ function ProductDetails({ id }: { id: string }) {
 
   if (result.isPending) {
     return (
-      <div role="status" className="h-96 animate-pulse rounded-card bg-surface-muted">
+      <div
+        role="status"
+        className="aspect-square max-w-xl animate-pulse rounded-plate bg-surface-muted"
+      >
         <span className="sr-only">Loading product</span>
       </div>
     );
@@ -38,14 +41,16 @@ function ProductDetails({ id }: { id: string }) {
 
   const product = result.data;
   return (
-    <article className="grid gap-8 md:grid-cols-2">
-      <Card className="flex items-center justify-center p-8">
+    <article className="grid gap-8 md:grid-cols-2 md:gap-12">
+      <div
+        className={`relative aspect-square overflow-hidden rounded-plate ${plateClass(product.category.slug)}`}
+      >
         <img
           src={product.imageUrl}
           alt={product.title}
-          className="max-h-[28rem] w-full object-contain"
+          className="absolute inset-0 h-full w-full object-contain p-12 mix-blend-multiply sm:p-16"
         />
-      </Card>
+      </div>
 
       <div className="flex flex-col gap-4">
         <Link
@@ -54,15 +59,15 @@ function ProductDetails({ id }: { id: string }) {
         >
           {product.category.name}
         </Link>
-        <h1 className="text-2xl font-bold sm:text-3xl">{product.title}</h1>
+        <h1 className="text-3xl font-semibold sm:text-4xl">{product.title}</h1>
         {product.rating && <Rating rating={product.rating} />}
-        <p className="text-2xl font-semibold">{formatPrice(product.price)}</p>
-        <p className="leading-relaxed text-text-muted">{product.description}</p>
+        <p className="font-display text-3xl font-semibold">{formatPrice(product.price)}</p>
+        <p className="max-w-prose leading-relaxed text-text-muted">{product.description}</p>
 
         {enquiring ? (
           <EnquiryForm product={product} onCancel={() => setEnquiring(false)} />
         ) : (
-          <Button className="self-start" onClick={() => setEnquiring(true)}>
+          <Button className="self-start px-6 py-3 text-base" onClick={() => setEnquiring(true)}>
             Enquire
           </Button>
         )}

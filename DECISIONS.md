@@ -35,6 +35,14 @@
 - **Why:** The look and feel will change, since creative work is still in progress. Brand values (colour, type, radius, spacing) live only in `theme.css` as `@theme` CSS variables. Components use semantic names (`bg-surface`, `text-brand`, `rounded-card`), so a rebrand edits one file.
 - **Trade-off:** Utility classes can scatter design decisions. A lint/review rule bans raw palette classes (e.g. `bg-blue-600`) in components.
 
+### D4a. Visual direction: "Showroom" (placeholder until the creative work lands)
+
+- **What:** Products sit on soft coloured plates, one colour per category. The home page's hero _is_ the five top-rated products (a spotlight plus four), not a slogan banner. Bricolage Grotesque for headings, Instrument Sans for body, on a 1.25 type scale.
+- **Data-source agnostic:** A category's plate colour comes from a stable hash of its slug onto the theme's plate tokens (`lib/plate.ts`). No Fake Store category names are hard-coded, so any future source's categories get colours automatically.
+- **Product photos:** `mix-blend-multiply` lets white photo backgrounds take on the plate colour.
+- **Fonts are self-hosted** via `@fontsource` (bundled at build time). There are no third-party font requests, so the CSP stays `'self'` and no visitor data goes to a font CDN.
+- **This was also the rebrand test for D4:** the whole restyle changed `theme.css`, two new components and class names in pages. No logic or tests changed, apart from one heading name.
+
 ### D5. No authentication in the MVP
 
 - **Why:** No acceptance criterion involves a signed-in actor. Customers browse and enquire anonymously, and requiring an account before an enquiry adds friction to the main conversion flow. The owner's curation of featured products is handled by config (D2).

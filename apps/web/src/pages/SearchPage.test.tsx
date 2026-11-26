@@ -21,9 +21,7 @@ describe('Search', () => {
     await user.type(screen.getByRole('searchbox', { name: 'Search products' }), '   ');
     await user.click(screen.getByRole('button', { name: 'Search' }));
     // Still on the home page: no navigation happened.
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Find what you need' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Top rated' })).toBeInTheDocument();
     expect(screen.queryByText('Enter a search term')).not.toBeInTheDocument();
   });
 

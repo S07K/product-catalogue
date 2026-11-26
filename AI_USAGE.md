@@ -23,6 +23,7 @@
 1. **Plan first, and ask before deciding architecture.** I told the agent to read the brief, write a roadmap, and stop to ask on every architecture decision instead of choosing silently. That produced D1–D6 in `DECISIONS.md`.
 2. **Push back on login.** I asked whether skipping auth would make the MVP feel unusable. The agent argued that no AC has an authenticated actor and that usability comes from UX states, validation and accessibility. I agreed and recorded it as D5.
 3. **Make the email provider genuinely swappable.** I asked that Mailpit be dev-only. That led to the `EMAIL_PROVIDER` switch, a provider-agnostic SMTP adapter, and a production guard that refuses Mailpit or localhost when `NODE_ENV=production`.
+4. **"The UI looks weak."** After the functional build I rejected the first UI as generic. Instead of patching styles, I had the agent diagnose why (system fonts, no type scale, every element the same white card, a slogan hero with no products, no category identity) and propose three directions with wireframes. I chose "Showroom". The agent then checked its plan against common generated-design defaults (e.g. warm cream backgrounds, identical card grids) before building, and verified the result with screenshots in a real browser.
 
 ## Where the AI got it wrong (and how it was caught)
 

@@ -48,9 +48,12 @@ export function Layout() {
       >
         Skip to content
       </a>
-      <header className="sticky top-0 z-[1] bg-surface shadow-sm">
+      <header className="sticky top-0 z-[1] border-b border-border bg-surface/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:gap-6">
-          <Link to="/" className="shrink-0 text-lg font-bold text-brand">
+          <Link
+            to="/"
+            className="shrink-0 font-display text-xl font-bold tracking-tight text-brand"
+          >
             Product Catalogue
           </Link>
           {/* key resets the input when the URL query changes (e.g. browser back). */}
@@ -58,10 +61,10 @@ export function Layout() {
         </div>
         <CategoryNav />
       </header>
-      <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+      <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:py-14">
         <Outlet />
       </main>
-      <footer className="border-t border-border bg-surface">
+      <footer className="mt-16 border-t border-border">
         <p className="mx-auto max-w-6xl px-4 py-6 text-sm text-text-muted">
           Questions about a product? Open it and use the Enquire button.
         </p>

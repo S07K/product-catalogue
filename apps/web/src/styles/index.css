@@ -1,13 +1,32 @@
 @import 'tailwindcss';
 @import './theme.css';
+/* Self-hosted fonts: bundled at build time, so no third-party font requests (CSP stays 'self'). */
+@import '@fontsource-variable/bricolage-grotesque';
+@import '@fontsource-variable/instrument-sans';
 
 @layer base {
   html {
     @apply bg-page text-text font-sans antialiased;
   }
 
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
+    text-wrap: balance;
+  }
+
   /* Visible, consistent keyboard focus everywhere. */
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-focus;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
   }
 }

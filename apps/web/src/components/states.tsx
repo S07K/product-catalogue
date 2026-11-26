@@ -7,9 +7,12 @@ export function LoadingGrid({ count = 4, label }: { count?: number; label: strin
   return (
     <div role="status" aria-live="polite">
       <span className="sr-only">{label}</span>
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5" aria-hidden="true">
+      <div
+        className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 lg:grid-cols-4"
+        aria-hidden="true"
+      >
         {Array.from({ length: count }, (_, i) => (
-          <Card key={i} className="h-72 animate-pulse bg-surface-muted" />
+          <div key={i} className="aspect-square animate-pulse rounded-plate bg-surface-muted" />
         ))}
       </div>
     </div>
