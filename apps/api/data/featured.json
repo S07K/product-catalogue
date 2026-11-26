@@ -1,0 +1,9 @@
+{
+  "home": ["11", "3", "18", "5", "12"],
+  "categories": {
+    "electronics": ["12", "11", "9"],
+    "jewelery": ["5", "6"],
+    "mens-clothing": ["3", "2"],
+    "womens-clothing": ["18", "19", "17"]
+  }
+}

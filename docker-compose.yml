@@ -1,0 +1,45 @@
+# Local stack: `docker compose up --build`, then open http://localhost:8080
+#   web      -> http://localhost:8080        (React app; nginx proxies /api to the API)
+#   mailpit  -> http://localhost:8025        (DEV-ONLY sales inbox for enquiry emails)
+# Every setting has a working default; create .env from .env.example only to override.
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports:
+      - '${WEB_PORT:-8080}:80'
+    depends_on:
+      api:
+        condition: service_healthy
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      # "development" because this stack uses Mailpit; the production config guard
+      # rejects dev mail hosts (see DECISIONS.md D3).
+      NODE_ENV: development
+      PORT: 3000
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      TRUST_PROXY: 1
+      PRODUCT_SOURCE: ${PRODUCT_SOURCE:-fakestore}
+      FAKESTORE_BASE_URL: ${FAKESTORE_BASE_URL:-https://fakestoreapi.com}
+      PRODUCT_CACHE_TTL_SECONDS: ${PRODUCT_CACHE_TTL_SECONDS:-300}
+      EMAIL_PROVIDER: smtp
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+      EMAIL_FROM: ${EMAIL_FROM:-Product Catalogue <no-reply@catalogue.local>}
+      SALES_INBOX: ${SALES_INBOX:-sales@catalogue.local}
+      ENQUIRY_RATE_LIMIT_MAX: ${ENQUIRY_RATE_LIMIT_MAX:-5}
+    depends_on:
+      - mailpit
+
+  # Development-only mail catcher. Not part of any production deployment:
+  # production points SMTP_* at a real provider (e.g. AWS SES).
+  mailpit:
+    image: axllent/mailpit:v1.29
+    ports:
+      - '${MAILPIT_UI_PORT:-8025}:8025'

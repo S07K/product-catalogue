@@ -1,0 +1,57 @@
+/*
+ * Design tokens: the ONLY place brand decisions live.
+ * Direction: "Showroom". Products sit on soft coloured plates, one colour per
+ * category, like a curated store window. Everything else stays quiet.
+ * A rebrand (once the creative work lands) means editing the values below.
+ *
+ * `--color-*: initial` removes Tailwind's default palette, so a raw class like
+ * `bg-blue-600` is not generated at all. Tokens-only is enforced, not just a convention.
+ */
+@theme {
+  --color-*: initial;
+
+  /* Brand */
+  --color-brand: #23305a;
+  --color-brand-hover: #18213f;
+  --color-brand-contrast: #ffffff;
+
+  /* Surfaces & text */
+  --color-page: #f5f6f8;
+  --color-surface: #ffffff;
+  --color-surface-muted: #eceef1;
+  --color-border: #d8dce3;
+  --color-text: #1e2230;
+  --color-text-muted: #5b6070;
+
+  /*
+   * Product plates. Categories are mapped onto these by a stable hash of their
+   * slug (see lib/plate.ts), so any product source's categories get a colour.
+   */
+  --color-plate-1: #e3e8ef; /* slate */
+  --color-plate-2: #ece6f3; /* lilac */
+  --color-plate-3: #e3ede5; /* sage */
+  --color-plate-4: #f6e6e4; /* blush */
+  --color-plate-5: #efeadf; /* sand */
+
+  /* Feedback */
+  --color-danger: #b42318;
+  --color-danger-surface: #fef3f2;
+  --color-success: #067647;
+  --color-success-surface: #ecfdf3;
+  --color-focus: #3d5bd9;
+  --color-star: #a15c07;
+
+  /* Typography: display carries the personality; body stays quiet. */
+  --font-display: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif;
+
+  /* Type scale: 1.25 (major third) from 1rem. */
+  --text-display: 3.052rem;
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.02em;
+
+  /* Shape: plates are softer than controls, which signals hierarchy. */
+  --radius-plate: 1.25rem;
+  --radius-card: 0.875rem;
+  --radius-control: 0.625rem;
+}

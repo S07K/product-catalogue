@@ -1,0 +1,88 @@
+import type { Logger } from 'pino';
+import type { CategoryProducts, CategorySummary, Product } from '@catalogue/shared';
+import type { ProductSource } from '../adapters/product-source/product-source';
+import type { FeaturedRepository } from '../adapters/featured/featured-repository';
+import { AppError } from '../errors';
+import { searchProducts } from './search';
+
+/** Used when the owner has not curated a category. */
+export const CATEGORY_TOP_RATED_FALLBACK_COUNT = 3;
+
+export class CatalogueService {
+  constructor(
+    private readonly products: ProductSource,
+    private readonly featured: FeaturedRepository,
+    private readonly logger: Logger,
+  ) {}
+
+  /** Categories derived from products, each with a count and its highest-rated product's image. */
+  async listCategories(): Promise<CategorySummary[]> {
+    const bySlug = new Map<string, Product[]>();
+    for (const p of await this.products.listProducts()) {
+      const group = bySlug.get(p.category.slug);
+      if (group) group.push(p);
+      else bySlug.set(p.category.slug, [p]);
+    }
+    return [...bySlug.values()]
+      .map((group) => ({
+        ...group[0]!.category,
+        productCount: group.length,
+        imageUrl: topByRating(group)[0]?.imageUrl ?? null,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  async getHomeFeatured(): Promise<Product[]> {
+    const [ids, products] = await Promise.all([
+      this.featured.getHomeProductIds(),
+      this.products.listProducts(),
+    ]);
+    return this.resolveIds(ids, products, 'home');
+  }
+
+  async getCategoryProducts(slug: string): Promise<CategoryProducts> {
+    const inCategory = (await this.products.listProducts()).filter((p) => p.category.slug === slug);
+    const category = inCategory[0]?.category;
+    if (!category) throw AppError.notFound(`Category "${slug}" not found`);
+
+    const curatedIds = await this.featured.getCategoryProductIds(slug);
+    const curated = curatedIds ? this.resolveIds(curatedIds, inCategory, `category:${slug}`) : [];
+    const topRated = curated.length > 0 ? curated : topByRating(inCategory);
+
+    const topIds = new Set(topRated.map((p) => p.id));
+    return { category, topRated, others: inCategory.filter((p) => !topIds.has(p.id)) };
+  }
+
+  /** Whole-word, ranked search over the catalogue. Rules live in ./search.ts (DECISIONS.md A3). */
+  async search(query: string): Promise<Product[]> {
+    return searchProducts(await this.products.listProducts(), query);
+  }
+
+  async getProduct(id: string): Promise<Product> {
+    const product = await this.products.getProductById(id);
+    if (!product) throw AppError.notFound(`Product "${id}" not found`);
+    return product;
+  }
+
+  /** Keeps the curated order; ids missing from the source are skipped and logged. */
+  private resolveIds(ids: string[], products: Product[], context: string): Product[] {
+    const byId = new Map(products.map((p) => [p.id, p]));
+    const resolved: Product[] = [];
+    for (const id of ids) {
+      const product = byId.get(id);
+      if (product) resolved.push(product);
+      else this.logger.warn({ id, context }, 'Featured product id not found in product source');
+    }
+    return resolved;
+  }
+}
+
+function topByRating(products: Product[]): Product[] {
+  return [...products]
+    .sort(
+      (a, b) =>
+        (b.rating?.average ?? 0) - (a.rating?.average ?? 0) ||
+        (b.rating?.count ?? 0) - (a.rating?.count ?? 0),
+    )
+    .slice(0, CATEGORY_TOP_RATED_FALLBACK_COUNT);
+}
