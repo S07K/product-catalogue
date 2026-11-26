@@ -132,4 +132,11 @@ curl -s localhost:8080/api/health/ready
 
 ## Time spent
 
-_To be completed by the author: see the note in the PR._
+**About 1h55m in total** (17:30 → 19:25 on 26 Nov 2026), within the 2–3 hour time-box. Everything was done in one continuous session directing Claude Code. Timings come from the session and the commit timestamps. Building and testing were interleaved (tests were written alongside code), so the split is approximate.
+
+| Phase     | Time    | What                                                                                                                                                                                                 |
+| --------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Planning  | ~40 min | Read the brief, made the architecture decisions (stack, curation, email, styling, auth, components), wrote `PLAN.md`/`DECISIONS.md`, set up the repo                                                 |
+| Building  | ~40 min | Shared contract, API, web app, Docker; then the UI redesign ("Showroom"), enquiry modal, category imagery, loading states, search relevance and health checks after hands-on review                  |
+| Testing   | ~20 min | 107 automated tests; deliberately breaking code to prove the tests catch it; browser walkthroughs; fresh-clone `docker compose` run; health checks exercised with dependencies stopped and restarted |
+| Reviewing | ~15 min | Hands-on review that drove the UI, search and health changes; auditing AI output (which found the unwritten `DECISIONS.md` sections); docs and PR                                                    |

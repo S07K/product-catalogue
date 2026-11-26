@@ -40,4 +40,4 @@
 
 ## Time spent
 
-_See README._
+See the [README](./README.md#time-spent): about 1h55m in total, in one session.
