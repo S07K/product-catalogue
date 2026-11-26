@@ -89,13 +89,13 @@ Commit after each step on branch `feat/product-catalogue`. Write tests **alongsi
 
 ## 7. Security & quality basics checklist
 
-- [ ] zod validation on every input (params, query, body); body size limit (`express.json({limit:'10kb'})`)
-- [ ] `helmet`; CORS restricted to `WEB_ORIGIN` for dev
-- [ ] `express-rate-limit` on `POST /api/enquiries`; honeypot field
-- [ ] HTML-escape user input in the email template; `replyTo` = customer and `from` = system address (prevents header spoofing)
-- [ ] No stack traces in responses; structured logging (pino)
-- [ ] No secrets committed; `.env.example` only; the app runs with defaults when there's no `.env`
-- [ ] Outbound fetch timeout (AbortSignal.timeout) on Fake Store calls
+- [x] zod validation on every input (params, query, body); body size limit (`express.json({limit:'10kb'})`)
+- [x] `helmet`; CORS restricted to `WEB_ORIGIN` for dev
+- [x] `express-rate-limit` on `POST /api/enquiries`; honeypot field
+- [x] HTML-escape user input in the email template; `replyTo` = customer and `from` = system address (prevents header spoofing)
+- [x] No stack traces in responses; structured logging (pino)
+- [x] No secrets committed; `.env.example` only; the app runs with defaults when there's no `.env`
+- [x] Outbound fetch timeout (AbortSignal.timeout) on Fake Store calls
 
 ## 8. Defaults chosen without asking (veto any of these)
 
