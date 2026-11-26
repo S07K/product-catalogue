@@ -33,4 +33,9 @@ export class SmtpEmailSender implements EmailSender {
   async send(message: EmailMessage): Promise<void> {
     await this.transporter.sendMail({ from: this.options.from, ...message });
   }
+
+  /** Opens an SMTP connection and authenticates, without sending anything. */
+  async verify(): Promise<void> {
+    await this.transporter.verify();
+  }
 }

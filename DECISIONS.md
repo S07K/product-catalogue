@@ -59,6 +59,17 @@
 - **Enquiry modal (revised after UI review):** The form first sat inline on the product page to avoid hand-rolled focus trapping. It now opens in the **native `<dialog>` element** via `showModal()`. The browser provides focus trapping, Esc to close, an inert background, top-layer stacking and focus return to the Enquire button, so we get a real modal with no library and no custom focus trap. Closing is blocked while a submission is in flight. The dialog is mounted fresh on each open so state never leaks between enquiries.
 - **Trade-off:** If modals, dropdowns or comboboxes arrive later, we'd add a headless primitive library (Radix or React Aria) rather than build those widgets by hand.
 
+### D7. Separate liveness and readiness health checks
+
+- **Why:** Orchestrators (Docker, ECS) and load balancers ask different questions. "Is the process alive?" decides restarts. "Can it serve traffic?" decides routing and alerting. Mixing them is a classic failure mode: if liveness checked Fake Store, an upstream outage would make ECS restart every healthy container over and over.
+- **`/api/health/live`:** no dependency checks. Used by the Docker `HEALTHCHECK` (and would be the ECS container health check).
+- **`/api/health/ready`:** runs dependency checks in parallel, each with a timeout so a hanging dependency can't hang the probe.
+  - **Product source is critical** (`503 unavailable`): with no catalogue there's nothing to serve. It goes through the cached source, so a brief blip covered by stale data still counts as ready, matching what customers see.
+  - **Email is non-critical** (`200 degraded`): browsing still works, so taking the instance out of rotation would be wrong, but monitoring can alert that enquiries are failing. The SMTP check is cached for 30s so frequent probes don't open a mail connection each time.
+- **Safe to expose:** responses contain only status words and timings, never hostnames or error messages (these are logged for operators). `Cache-Control: no-store`. Probe requests are excluded from request logs so they don't drown real traffic.
+- **Verified on the running stack** in all three states, including restarts. That testing found an nginx bug: it resolved the API's hostname once and broke after the API container was replaced. The proxy now re-resolves through Docker's DNS.
+- **Next:** feed `degraded`/`unavailable` into alerting (CloudWatch alarm on the ALB target health, or a synthetic check on `/ready`).
+
 ## Assumptions (where ACs were unclear)
 
 | #   | Gap in the ACs                             | Assumption                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |

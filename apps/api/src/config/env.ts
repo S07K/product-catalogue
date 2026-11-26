@@ -21,6 +21,7 @@ const EnvSchema = z
     PRODUCT_CACHE_TTL_SECONDS: z.coerce.number().int().min(0).default(300),
     UPSTREAM_TIMEOUT_MS: z.coerce.number().int().min(100).default(5000),
     FEATURED_CONFIG_PATH: z.string().default('./data/featured.json'),
+    HEALTH_CHECK_TIMEOUT_MS: z.coerce.number().int().min(100).default(3000),
 
     EMAIL_PROVIDER: z.enum(['smtp', 'console']).default('smtp'),
     SMTP_HOST: z.string().default('localhost'),
@@ -87,6 +88,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env) {
       timeoutMs: env.UPSTREAM_TIMEOUT_MS,
     },
     featuredConfigPath: env.FEATURED_CONFIG_PATH,
+    healthCheckTimeoutMs: env.HEALTH_CHECK_TIMEOUT_MS,
     email: {
       provider: env.EMAIL_PROVIDER,
       smtp: {

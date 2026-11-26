@@ -98,17 +98,30 @@ apps/web/
 
 ## API
 
-| Method | Path                             | Response                                    |
-| ------ | -------------------------------- | ------------------------------------------- |
-| GET    | `/api/health`                    | `{ status: "ok" }`                          |
-| GET    | `/api/categories`                | `Category[]`                                |
-| GET    | `/api/products/featured`         | the 5 curated home products                 |
-| GET    | `/api/categories/:slug/products` | `{ category, topRated, others }`            |
-| GET    | `/api/products?q=term`           | products matching every word of `q`         |
-| GET    | `/api/products/:id`              | `Product` or 404                            |
-| POST   | `/api/enquiries`                 | `202 { enquiryId }`; emails the sales inbox |
+| Method | Path                                     | Response                                                                         |
+| ------ | ---------------------------------------- | -------------------------------------------------------------------------------- |
+| GET    | `/api/health/live` (alias `/api/health`) | liveness: `{ status: "ok" }`, no dependency checks                               |
+| GET    | `/api/health/ready`                      | readiness: `ok` / `degraded` (200) or `unavailable` (503), per-dependency status |
+| GET    | `/api/categories`                        | `CategorySummary[]` (with count and image)                                       |
+| GET    | `/api/products/featured`                 | the 5 curated home products                                                      |
+| GET    | `/api/categories/:slug/products`         | `{ category, topRated, others }`                                                 |
+| GET    | `/api/products?q=term`                   | products matching every word of `q`                                              |
+| GET    | `/api/products/:id`                      | `Product` or 404                                                                 |
+| POST   | `/api/enquiries`                         | `202 { enquiryId }`; emails the sales inbox                                      |
 
 Every error looks like `{ "error": { "code", "message", "details"? } }`.
+
+### Health checks
+
+```bash
+curl -s localhost:8080/api/health/ready
+# {"status":"ok","checks":{"productSource":{"status":"ok","critical":true,"durationMs":3},
+#   "email":{"status":"ok","critical":false,"durationMs":12}},"uptimeSeconds":42}
+```
+
+- **Liveness** (`/live`) is what the container health check uses. It never checks dependencies, so a Fake Store outage can't cause healthy containers to be restarted.
+- **Readiness** (`/ready`) is for load balancers and monitoring. The product source is critical (`503 unavailable`). Email is non-critical (`200 degraded`: browsing works, enquiries don't). Each check is time-limited (`HEALTH_CHECK_TIMEOUT_MS`), and the SMTP check is cached for 30s.
+- Try a degraded state: `docker compose stop mailpit`, then call `/ready` again.
 
 ## Common changes
 

@@ -10,6 +10,8 @@ import { SmtpEmailSender } from './adapters/email/smtp.adapter';
 import { ConsoleEmailSender } from './adapters/email/console.adapter';
 import { CatalogueService } from './catalogue/catalogue.service';
 import { EnquiryService } from './enquiries/enquiry.service';
+import { HealthService } from './health/health.service';
+import { readinessChecks } from './health/readiness-checks';
 import type { AppDependencies } from './app';
 
 /**
@@ -23,16 +25,18 @@ export function buildDependencies(
   const products = buildProductSource(config, logger);
   const featured = JsonFileFeaturedRepository.fromFile(config.featuredConfigPath);
   const catalogue = new CatalogueService(products, featured, logger);
-  const enquiries = new EnquiryService(
-    catalogue,
-    buildEmailSender(config, logger),
-    config.email.salesInbox,
+  const email = buildEmailSender(config, logger);
+  const enquiries = new EnquiryService(catalogue, email, config.email.salesInbox, logger);
+
+  const health = new HealthService(readinessChecks(products, email), {
+    timeoutMs: config.healthCheckTimeoutMs,
     logger,
-  );
+  });
 
   return {
     catalogue,
     enquiries,
+    health,
     logger,
     webOrigin: config.webOrigin,
     trustProxy: config.trustProxy,

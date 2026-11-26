@@ -11,4 +11,8 @@ export class ConsoleEmailSender implements EmailSender {
       `Email (not sent):\n${message.text}`,
     );
   }
+
+  async verify(): Promise<void> {
+    // Nothing external to reach.
+  }
 }

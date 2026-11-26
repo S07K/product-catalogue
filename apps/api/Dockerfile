@@ -24,6 +24,7 @@ COPY apps/api/data apps/api/data
 WORKDIR /repo/apps/api
 USER node
 EXPOSE 3000
+# Liveness only: restarting the container can't fix a dependency outage (see /api/health/ready).
 HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget -qO- http://127.0.0.1:3000/api/health || exit 1
+  CMD wget -qO- http://127.0.0.1:3000/api/health/live || exit 1
 CMD ["node", "dist/server.js"]

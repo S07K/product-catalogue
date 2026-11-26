@@ -9,6 +9,8 @@ import {
 import { FixtureProductSource } from './adapters/product-source/fixture.adapter';
 import { CatalogueService } from './catalogue/catalogue.service';
 import { EnquiryService } from './enquiries/enquiry.service';
+import { HealthService } from './health/health.service';
+import { readinessChecks } from './health/readiness-checks';
 import { createApp } from './app';
 
 export const silentLogger = pino({ level: 'silent' });
@@ -85,6 +87,10 @@ export class FakeEmailSender implements EmailSender {
     if (this.failWith) throw this.failWith;
     this.sent.push(message);
   }
+
+  async verify(): Promise<void> {
+    if (this.failWith) throw this.failWith;
+  }
 }
 
 export function buildTestApp(
@@ -92,6 +98,7 @@ export function buildTestApp(
     products?: ProductSource;
     featured?: FeaturedConfig;
     rateLimitMax?: number;
+    healthTimeoutMs?: number;
   } = {},
 ) {
   const products = options.products ?? new FixtureProductSource(testProducts);
@@ -108,9 +115,14 @@ export function buildTestApp(
     silentLogger,
     () => 'enq-123',
   );
+  const health = new HealthService(readinessChecks(products, email), {
+    timeoutMs: options.healthTimeoutMs ?? 1000,
+    logger: silentLogger,
+  });
   const app = createApp({
     catalogue,
     enquiries,
+    health,
     logger: silentLogger,
     webOrigin: 'http://localhost:5173',
     trustProxy: 0,

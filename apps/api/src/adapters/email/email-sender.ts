@@ -17,4 +17,6 @@ export interface EmailMessage {
 export interface EmailSender {
   /** Resolves once the provider has accepted the message; rejects otherwise. */
   send(message: EmailMessage): Promise<void>;
+  /** Readiness probe: resolves if the provider is reachable and accepts our credentials. */
+  verify(): Promise<void>;
 }
